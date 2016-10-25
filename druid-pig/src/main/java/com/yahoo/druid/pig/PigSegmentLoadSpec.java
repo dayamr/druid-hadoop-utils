@@ -13,10 +13,12 @@ package com.yahoo.druid.pig;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+
+import org.joda.time.Interval;
+
 import io.druid.granularity.QueryGranularity;
 import io.druid.indexer.hadoop.DatasourceIngestionSpec;
 import io.druid.query.filter.DimFilter;
-import org.joda.time.Interval;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +61,7 @@ public class PigSegmentLoadSpec
     return filter;
   }
   
-  public DatasourceIngestionSpec toDatasourceIngestionSpec(String dataSource, Interval interval) {
+  public DatasourceIngestionSpec toDatasourceIngestionSpec(String dataSource, List<Interval> intervals) {
     List<String> metricStrs = new ArrayList<>(metrics.size());
     for(Metric m : metrics) {
       metricStrs.add(m.getName());
@@ -67,11 +69,13 @@ public class PigSegmentLoadSpec
 
     return new DatasourceIngestionSpec(
         dataSource,
-        interval,
+        null,
+        intervals,
         filter,
         granularity,
         dimensions,
-        metricStrs
+        metricStrs,
+        true
     );
   }
 }
