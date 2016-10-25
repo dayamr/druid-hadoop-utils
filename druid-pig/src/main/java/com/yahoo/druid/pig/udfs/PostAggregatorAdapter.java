@@ -15,11 +15,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.druid.indexer.HadoopDruidIndexerConfig;
-import io.druid.query.aggregation.PostAggregator;
-import io.druid.segment.data.ObjectStrategy;
-import io.druid.segment.serde.ComplexMetricSerde;
-import io.druid.segment.serde.ComplexMetrics;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pig.EvalFunc;
@@ -28,6 +24,12 @@ import org.apache.pig.data.DataByteArray;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.data.TupleFactory;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
+
+import io.druid.indexer.HadoopDruidIndexerConfig;
+import io.druid.query.aggregation.PostAggregator;
+import io.druid.segment.data.ObjectStrategy;
+import io.druid.segment.serde.ComplexMetricSerde;
+import io.druid.segment.serde.ComplexMetrics;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -45,7 +47,7 @@ public abstract class PostAggregatorAdapter<T> extends EvalFunc<T>
   protected final List<Metric> columnTypes;
 
   public PostAggregatorAdapter(String aggFactorySpec, String inputSchema) {
-    ObjectMapper jsonMapper = HadoopDruidIndexerConfig.jsonMapper;
+    ObjectMapper jsonMapper = HadoopDruidIndexerConfig.JSON_MAPPER;
     try {
       this.aggFactory = jsonMapper.readValue(aggFactorySpec, PostAggregator.class);
       this.columnTypes = jsonMapper.readValue(

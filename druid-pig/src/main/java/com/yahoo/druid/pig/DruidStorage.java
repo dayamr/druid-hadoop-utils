@@ -10,14 +10,11 @@
  */
 package com.yahoo.druid.pig;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yahoo.druid.hadoop.DruidInputFormat;
 import com.yahoo.druid.pig.udfs.DruidUtils;
-import io.druid.data.input.InputRow;
-import io.druid.indexer.HadoopDruidIndexerConfig;
-import io.druid.indexer.hadoop.DatasourceRecordReader;
-import io.druid.segment.serde.ComplexMetricSerde;
-import io.druid.segment.serde.ComplexMetrics;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -41,10 +38,17 @@ import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.druid.data.input.InputRow;
+import io.druid.indexer.HadoopDruidIndexerConfig;
+import io.druid.indexer.hadoop.DatasourceRecordReader;
+import io.druid.segment.serde.ComplexMetricSerde;
+import io.druid.segment.serde.ComplexMetrics;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -96,8 +100,7 @@ public class DruidStorage extends LoadFunc implements LoadMetadata
   {
     this.schemaFile = schemaFile;
     this.interval = interval;
-
-    this.jsonMapper = HadoopDruidIndexerConfig.jsonMapper;
+    this.jsonMapper = HadoopDruidIndexerConfig.JSON_MAPPER;
   }
 
   @Override
@@ -201,9 +204,11 @@ public class DruidStorage extends LoadFunc implements LoadMetadata
     }
 
     Configuration conf = job.getConfiguration();
+    List<Interval> intervals = new ArrayList<>();
+    intervals.add(new Interval(interval));
     conf.set(
         DruidInputFormat.CONF_DRUID_SCHEMA,
-        jsonMapper.writeValueAsString(spec.toDatasourceIngestionSpec(dataSource, new Interval(interval)))
+        jsonMapper.writeValueAsString(spec.toDatasourceIngestionSpec(dataSource, intervals))
     );
   }
 

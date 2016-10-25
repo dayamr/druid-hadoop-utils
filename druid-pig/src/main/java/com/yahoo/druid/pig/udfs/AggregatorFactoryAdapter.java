@@ -12,18 +12,7 @@ package com.yahoo.druid.pig.udfs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import io.druid.indexer.HadoopDruidIndexerConfig;
-import io.druid.query.aggregation.AggregatorFactory;
-import io.druid.query.aggregation.BufferAggregator;
-import io.druid.query.extraction.ExtractionFn;
-import io.druid.segment.ColumnSelectorFactory;
-import io.druid.segment.DimensionSelector;
-import io.druid.segment.FloatColumnSelector;
-import io.druid.segment.LongColumnSelector;
-import io.druid.segment.ObjectColumnSelector;
-import io.druid.segment.data.ObjectStrategy;
-import io.druid.segment.serde.ComplexMetricSerde;
-import io.druid.segment.serde.ComplexMetrics;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pig.EvalFunc;
@@ -33,6 +22,19 @@ import org.apache.pig.data.DataByteArray;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.data.TupleFactory;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
+
+import io.druid.indexer.HadoopDruidIndexerConfig;
+import io.druid.query.aggregation.AggregatorFactory;
+import io.druid.query.aggregation.BufferAggregator;
+import io.druid.query.dimension.DimensionSpec;
+import io.druid.segment.ColumnSelectorFactory;
+import io.druid.segment.DimensionSelector;
+import io.druid.segment.FloatColumnSelector;
+import io.druid.segment.LongColumnSelector;
+import io.druid.segment.ObjectColumnSelector;
+import io.druid.segment.data.ObjectStrategy;
+import io.druid.segment.serde.ComplexMetricSerde;
+import io.druid.segment.serde.ComplexMetrics;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -48,7 +50,7 @@ public abstract class AggregatorFactoryAdapter<T> extends EvalFunc<T>
     protected final ObjectStrategy strategy;
 
     public AggregatorFactoryAdapter(String aggFactorySpec, String metricType) {
-      ObjectMapper jsonMapper = HadoopDruidIndexerConfig.jsonMapper;
+      ObjectMapper jsonMapper = HadoopDruidIndexerConfig.JSON_MAPPER;
       try {
         this.aggFactory = jsonMapper.readValue(aggFactorySpec, AggregatorFactory.class);
       } catch(IOException ex) {
@@ -149,13 +151,12 @@ class InternalColumnSelectorFactory implements ColumnSelectorFactory
     };
   }
 
-  @Override
-  public DimensionSelector makeDimensionSelector(String paramString, ExtractionFn extractionFn)
-  {
-    throw new RuntimeException("not supported");
-  }
+    @Override
+    public DimensionSelector makeDimensionSelector(DimensionSpec dimensionSpec) {
+        throw new RuntimeException("not supported");
+    }
 
-  @Override
+    @Override
   public FloatColumnSelector makeFloatColumnSelector(String paramString)
   {
     return new FloatColumnSelector()
